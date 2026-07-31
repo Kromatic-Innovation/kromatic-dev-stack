@@ -67,7 +67,8 @@ For each of the seven, assign exactly one disposition:
 **Bias toward Skip and Merge for a solo developer or a repo with no automation.**
 The gate model earns its cost when multiple lanes run in parallel and an
 automated queue can race a human. A one-person repo with one branch gets most of
-the value from Perlman and Quine alone.
+the value from `quine` alone, plus the Perlman/Occam/Dorothy set if they want the
+product gate — those three only work together.
 
 **Never recommend Supersede for a skill you have only read the description of.**
 If you are proposing to replace something, read it first.
@@ -98,9 +99,15 @@ End with a sequence, not a set. Which one persona should they try first, on what
 kind of task, and what should they look for to judge whether it earned its
 place? Then what to add second, once the first is habitual.
 
-A good first recommendation is usually **Perlman before a feature** (immediate,
-self-contained, no infrastructure assumptions) or **Quine after a PR** (drops
-into an existing review habit).
+A good first recommendation is usually **a reviewer** — `quine` after a PR (drops
+straight into an existing review habit), or `zaha` on a change that crosses a
+module boundary. Reviewers attach to work that already exists and complete on
+their own.
+
+**Do not recommend Perlman as a solo first install.** It ends by design with a
+handoff to Occam, so on its own it produces a scope lock and then stops at a
+skill that isn't there. If they want to start with the product gate, recommend
+Perlman + Occam + Dorothy as a unit and say why.
 
 ## Phase 1 output format
 

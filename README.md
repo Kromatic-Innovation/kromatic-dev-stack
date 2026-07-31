@@ -1,94 +1,114 @@
 # kromatic-dev-stack
 
-**The delivery workflow [Kromatic](https://kromatic.com) uses to ship client software with Claude Code** — seven agent personas with human gates between them.
+**The delivery workflow [Kromatic](https://kromatic.com) uses to ship software** — seven agent personas with human gates between them.
 
-Most agent setups are one very capable assistant with a long prompt. This is a different bet: **separate personas that hand off through explicit gates, and refuse to do each other's jobs.** The product strategist may not choose a database. The developer may not decide what to build. The QA reviewer reports findings but does not decide which get fixed. Those refusals are the point — they're what stop an agent from confidently building the wrong thing well.
+## Get going
 
-This is not a demo. It's the working process, redacted of our internal infrastructure.
-
-## The flow
-
-```
-  Perlman → Occam → Zaha → Eiko → Dorothy → Quine → Occam → ship → Aristotle
-   (what)   (lanes) (arch) (design)  (build)   (QA)  (triage)        (measure)
-      ↑                                                                  ↓
-      └────────────  human gates at scope + merge; results feed back  ─────┘
-```
-
-| Persona | Role | Named for |
-|---|---|---|
-| **Perlman** | Product Manager — challenges the request, cuts an MVP slice, locks scope | Radia Perlman, who invented the protocol that stops a distributed system looping forever |
-| **Occam** | Orchestrator — decomposes into lanes, dispatches workers, holds every gate | William of Ockham, the 14th-century friar whose razor says don't multiply entities beyond necessity — which is most of an orchestrator's job |
-| **Zaha** | Architect — structural boundaries before the build, root-cause review after | Zaha Hadid, first woman to win the Pritzker |
-| **Eiko** | Designer — design intent for user-facing work | Eiko Ishioka, Oscar-winning visual designer |
-| **Dorothy** | Developer — owns implement → test → PR → green | Dorothy Vaughan, who led NASA's West Area Computing unit and taught herself FORTRAN |
-| **Quine** | QA — test quality and convention audit after CI is green | W.V.O. Quine, the logician — and a quine is also a self-reproducing program |
-
-**The names are a scheme, not a dependency.** Nothing in the skills keys off them beyond the directory name, the frontmatter `name:`, and cross-references between personas. Rename them to whatever fits your team — just rename all three together, plus the references in other skills, or the handoffs break. `/harness-adopt` (below) will do it for you.
-| **Aristotle** | Analyst — defines the metric before an experiment ships, reads out the result | Aristotle, who insisted conclusions come from observation rather than from how good the argument sounds |
-
-## The ideas worth stealing
-
-Even if you never install this, five rules in here have earned their place by catching real failures:
-
-1. **Fetch before you analyze.** A stale checkout doesn't make an agent cautious — it makes it confidently wrong. Every planning gate starts with `git fetch` and a not-behind check. We have watched a full issue graph get built on a dependency version that had not existed on origin for hours.
-2. **Verify by running, not by testing.** "Tests pass" is not evidence a behavior works. A change with a behavioral surface never goes CI-green → merge with *zero* observation of the real flow.
-3. **Applying a "ready" label is a dispatch.** If an automated queue watches your labels, labelling an issue hands it off as surely as spawning an agent does — and the queue does not wait for your conversation to end.
-4. **The reviewer reports; the orchestrator disposes.** QA ranks findings by blast radius. Someone else decides what blocks merge. Collapsing those two roles is how review becomes either rubber-stamping or bikeshedding.
-5. **File the vision, don't discuss it away.** Everything the product pass surfaces that isn't in the MVP slice gets filed as an epic *before* scope locks. An un-filed idea dies with the session.
-
-## Install
-
-These are [Claude Code skills](https://docs.claude.com/en/docs/claude-code/skills). Copy the ones you want into your skills directory:
+Clone it, then paste the prompt below to your coding agent. It reads the repo, compares it to how your team already works, and installs only the parts that fit — asking you before each one.
 
 ```bash
 git clone https://github.com/Kromatic-Innovation/kromatic-dev-stack.git
-cp -R kromatic-dev-stack/skills/* ~/.claude/skills/
 ```
 
-For a single project instead of globally, copy into `<your-repo>/.claude/skills/`.
+> Read the repo at `<path-to-clone>` — start with `README.md` and `ASSUMPTIONS.md`, then the skills under `skills/`. Then invoke the `harness-adopt` skill in that repo and follow it: assess my existing setup against this bundle, tell me per role whether to install, merge, supersede, or skip, and flag every assumption that doesn't match how my team works. Then install the ones I approve, one at a time, adapting each to my conventions. Ask me before each install; don't copy anything I haven't agreed to.
 
-Then invoke a persona by name — `/perlman`, `/occam`, `/dorothy` — or let Claude route to them.
+That's the whole quick start. Full detail, including manual installation, is in **[INSTALL.md](INSTALL.md)**.
 
-**Don't install all seven on day one** — that's seven unfamiliar processes at once. But "start with one" isn't quite right either, because the personas are not equally independent:
+> Shipped as [Claude Code skills](https://docs.claude.com/en/docs/claude-code/skills), because that's what we run. The process itself is not Claude-specific — the personas are prompts and the gates are rules, so they port to any agent setup that can hold a role and hand off.
 
-- **The reviewers run standalone.** `/quine`, `/zaha`, `/eiko`, and `/aristotle` attach to work that already exists — a diff, a PR, a shipped experiment. Each produces a complete result on its own and hands findings to a human if no orchestrator is installed. **Any one of these is a safe first install.**
-- **The build loop is a set.** `/perlman` ends by design with "Scope is locked, handing off to Occam." Occam never implements inline — it dispatches Dorothy. Dorothy re-invokes Occam after opening a PR. Install **Perlman + Occam + Dorothy together**, or the chain dead-ends at a skill that isn't there.
+## Why bother
 
-So: one reviewer first, then the build loop as a unit once the gate model feels familiar.
+Most agent setups are one very capable assistant with a long prompt. Multi-agent frameworks usually split work by *task* — a researcher, a coder, a tester — which is a division of labor.
 
-### Two skills need infrastructure you supply
+This is a division of **authority**. Each role is defined as much by what it may not do as by what it does:
 
-Everything here runs standalone except these, which depend on things a bundle cannot ship:
+- The product manager may not choose a database.
+- The developer may not decide what to build.
+- The QA reviewer reports findings but does not decide which ones block the merge.
+- The orchestrator never writes implementation code, no matter how small the fix.
 
-- **`/quine`** — its findings log posts a review record to the PR, which needs a comment-posting wrapper of your own (`GH_COMMENT_POST`, see `quine/SKILL.md`). Without it the review still runs and prints findings to stdout; only the durable PR record is lost.
-- **`/retro`** — its multi-reviewer phase dispatches to persona subagents registered in your own `.claude/agents/`, and it writes entries to a retro log location you choose. Without those, run it single-threaded and file the output wherever you keep decisions.
+Those refusals are the entire point. An agent that can do everything will confidently build the wrong thing very well, and nothing in the run will flag it — because the thing that would have objected is the same thing that made the decision.
 
-Neither degrades silently: both say what is missing.
+**Then it puts the human in exactly two places:** approving what gets built, and approving what merges. Not "human in the loop" as a general posture — two specific gates, at the two points where being wrong is most expensive to undo.
 
-### Recommended: let it install itself
+### What that buys you in practice
 
-These skills assume conventions you may not share — a `develop` → `staging` → `main` promotion path, MoSCoW labels, GitHub Issues as the system of record. Rather than copying files and finding out mid-lane, clone the repo and hand your agent this:
+Five rules in here exist because something went wrong without them. They're the clearest evidence this is a working process rather than a diagram:
 
-> Read the repo at `<path-to-clone>` — start with `README.md` and `ASSUMPTIONS.md`, then the skills under `skills/`. Then invoke the `harness-adopt` skill in that repo and follow it: assess my existing skills and repo conventions against this bundle, tell me per persona whether to install, merge, supersede, or skip, and flag every assumption that doesn't match my setup. Then install the ones I approve, one at a time, adapting each to my conventions as you go. Ask me before each install; don't copy anything I haven't agreed to.
+1. **Fetch before you analyze.** A stale checkout doesn't make an agent cautious — it makes it confidently wrong. Every planning step starts by confirming the local copy isn't behind. We have watched a full plan get built on a dependency version that had not existed for hours.
+2. **Verify by running, not by testing.** "Tests pass" is not evidence a feature works. Nothing with a visible behavior merges without someone actually driving it.
+3. **Marking work "ready" is a handoff.** If anything automated watches your tickets, changing a label hands the work off as surely as assigning it to a person — and it doesn't wait for your meeting to end.
+4. **The reviewer reports; the orchestrator decides.** QA ranks findings by how much damage each could do. Someone else decides what blocks the merge. Collapse those two roles and review becomes either rubber-stamping or bikeshedding.
+5. **File the vision, don't discuss it away.** Everything the product pass surfaces that isn't in the current slice gets written down as a tracked item *before* scope locks. An unfiled idea dies with the conversation.
 
-`/harness-adopt` runs in two phases. **Assess** reads your `~/.claude/skills/`, your `CLAUDE.md`/`AGENTS.md`, your branching model, your label vocabulary, and whether any automation watches your repos — then reports per persona: install as-is, install with edits, merge, supersede, or skip. **Apply** then installs only what you approve, one persona per confirmation, rewriting each to your conventions rather than dropping ours on top of yours.
+### When it isn't worth it
 
-It's biased toward recommending *fewer* installs than more. A solo developer on a single-branch repo genuinely does not need all seven, and it will say so.
+If you're one person on one repo with one branch, most of this is overhead. Take the QA reviewer and the product gate and leave the rest — the adoption skill will tell you the same thing.
 
-If you'd rather do it by hand, the assumptions worth checking are in [`ASSUMPTIONS.md`](ASSUMPTIONS.md).
+## The process
+
+Seven roles, in the order they act. The **gates** are the load-bearing part: each one is a point where work stops until a condition is met.
+
+**1. Product Manager** — *before anything is built*
+Challenges the request rather than accepting it. Who is this for, what changes for them, what happens if we don't build it? Cuts the smallest version that would actually teach us something, writes down explicitly what is **not** in scope, and files the rest of the vision so it isn't lost.
+
+> **GATE — scope lock (human).** Nothing proceeds until a person agrees on what is being built and what is excluded. This is the cheapest place in the whole process to change your mind.
+
+**2. Orchestrator** — *turns approved scope into parallel work*
+Breaks the work into **lanes** — independent workstreams, roughly one per repo or area, each sized to a single sitting. Where lanes depend on each other, it sequences them explicitly so lane B doesn't start on top of lane A's unfinished work. Then it dispatches specialists and holds every gate below. It coordinates; it does not implement.
+
+**3. Architect** — *only when the change is structural*
+Skipped for a clear bug fix. Runs when work crosses a module boundary, touches a schema, or raises a "should this be split?" question. Sets the structural boundaries **before** anyone writes code, and reviews for root cause rather than symptom afterward.
+
+**4. Designer** — *only when a person or another system will use it*
+Defines the intended experience before implementation, covering the states teams routinely forget: empty, loading, and error, not just the happy path. Covers machine-facing surfaces too — an API another agent consumes has a user experience, and it's usually worse than the human one.
+
+**5. Developer** — *builds it*
+Owns the change end to end: implement, test, open the pull request, keep it green. Does not decide what to build, and does not decide what gets fixed after review.
+
+> **GATE — checks green.** No review starts on a red build. Reviewing broken work wastes the reviewer.
+
+**6. QA** — *reviews what was built*
+Audits test quality and conventions, and ranks what it finds by how much damage each could do. It does not decide what gets fixed — it hands the ranked list back to the orchestrator, who classifies each finding as must-fix, should-fix, or won't-fix, with a reason.
+
+> **GATE — verify by running.** Before merge, someone drives the actual change and observes it working. A passing test suite does not satisfy this.
+
+> **GATE — merge (human).** The second and last place a person is required.
+
+**7. Analyst** — *closes the loop*
+Defines the success metric **before** the change ships — including what result would count as a failure — and reads out the actual result afterward. Deciding what "working" means after you've seen the numbers is how every change ends up looking like a win.
+
+Then the loop closes: what the analyst learns becomes the next product conversation.
+
+## Skills as personas
+
+Each role ships as a named persona you invoke directly — `/perlman`, `/occam`, `/dorothy`. The names exist because `/quine` is easier to remember and call than `/qa-test-quality-reviewer`, and because a named colleague with opinions is easier to think with than a configuration profile.
+
+They're named for historical figures whose actual work maps to the role:
+
+| Persona | Role | Named for |
+|---|---|---|
+| **Perlman** | Product Manager | Radia Perlman, who invented the protocol that stops a distributed system looping forever |
+| **Occam** | Orchestrator | William of Ockham, the 14th-century friar whose razor says don't multiply entities beyond necessity — which is most of an orchestrator's job |
+| **Zaha** | Architect | Zaha Hadid, the first woman to win the Pritzker Prize for architecture |
+| **Eiko** | Designer | Eiko Ishioka, the Oscar-winning designer whose work spanned film, stage, and advertising |
+| **Dorothy** | Developer | Dorothy Vaughan, who led NASA's West Area Computing unit and taught herself FORTRAN to keep her team employed |
+| **Quine** | QA | W.V.O. Quine, the logician — and a quine is also a program that reproduces its own source |
+| **Aristotle** | Analyst | Aristotle, who insisted conclusions come from observation rather than from how good the argument sounds |
+
+**The names are a convention, not a dependency.** Nothing keys off them except the folder name, the `name:` field, and the references the personas make to each other. Rename them to suit your team — just change all three together or the handoffs break silently. `/harness-adopt` will do it properly.
 
 ## What is deliberately not here
 
 This bundle ships the *delivery* half of our workflow. Left out on purpose:
 
-- **Strategy and governance personas.** Where a gate says to escalate a strategic question ("is this venture's premise still true?") or a governance one ("this rule needs changing everywhere"), route it to your own equivalent or to a human. Don't invent a persona to absorb the escalation.
-- **Our automation substrate.** We run an autonomous build queue that picks up labelled issues overnight. The skills describe the *contract* with such a queue — repo locks, lifecycle labels, dispatch races — generically, so the rules survive whether you run one or not.
-- **Deploy topology, org rulesets, and credential wiring.** Yours will differ, and ours is not interesting.
+- **Strategy and governance roles.** Where a gate says to escalate a strategic question ("is this still the right business to be in?") or a governance one ("this rule needs to change everywhere"), send it to your own equivalent or to a person. Don't invent a persona to absorb it.
+- **Our overnight build queue.** We run automation that picks up approved tickets and builds them unattended. The skills describe how to work safely *alongside* something like that — locking, handoff races — in general terms, so the rules make sense whether or not you run one.
+- **Deployment setup, repository rules, and credential wiring.** Yours will differ, and ours isn't interesting.
 
 ### Optional companions
 
-- **[`ideate-core`](https://www.npmjs.com/package/ideate-core)** — our ideation engine on npm. Perlman's Imagine step can call it to generate and stress-test a pool of candidate visions across temperature briefs, instead of anchoring on the first framing. `npm install ideate-core`.
+- **[`ideate-core`](https://www.npmjs.com/package/ideate-core)** — our ideation engine on npm. The product manager's imagine step can call it to generate and stress-test a range of candidate directions instead of anchoring on the first one. `npm install ideate-core`.
 - **`kromatic.com/mcp`** — our hosted MCP server, if you want the personas to reach our published lean-startup material directly.
 
 ## Why we published it
@@ -97,7 +117,7 @@ We're an AI and innovation transformation consultancy. This bundle is one artifa
 
 If the model is useful to you, take it — that's the whole intent. If you'd rather we ran it with you, [that's what we do](https://kromatic.com).
 
-Issues and PRs welcome, particularly "this rule didn't survive contact with my setup" reports — those are the most useful thing you can send us.
+Issues and pull requests welcome, particularly "this rule didn't survive contact with my setup" reports — those are the most useful thing you can send us.
 
 ## Questions
 

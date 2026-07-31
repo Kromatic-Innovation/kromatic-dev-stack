@@ -18,12 +18,14 @@ This is not a demo. It's the working process, redacted of our internal infrastru
 | Persona | Role | Named for |
 |---|---|---|
 | **Perlman** | Product Manager — challenges the request, cuts an MVP slice, locks scope | Radia Perlman, who invented the protocol that stops a distributed system looping forever |
-| **Occam** | Orchestrator — decomposes into lanes, dispatches workers, holds every gate | William of Ockham |
+| **Occam** | Orchestrator — decomposes into lanes, dispatches workers, holds every gate | William of Ockham, the 14th-century friar whose razor says don't multiply entities beyond necessity — which is most of an orchestrator's job |
 | **Zaha** | Architect — structural boundaries before the build, root-cause review after | Zaha Hadid, first woman to win the Pritzker |
 | **Eiko** | Designer — design intent for user-facing work | Eiko Ishioka, Oscar-winning visual designer |
 | **Dorothy** | Developer — owns implement → test → PR → green | Dorothy Vaughan, who led NASA's West Area Computing unit and taught herself FORTRAN |
-| **Quine** | QA — test quality and convention audit after CI is green | W.V.O. Quine (a quine is also a self-reproducing program) |
-| **Aristotle** | Analyst — defines the metric before an experiment ships, reads out the result | Aristotle |
+| **Quine** | QA — test quality and convention audit after CI is green | W.V.O. Quine, the logician — and a quine is also a self-reproducing program |
+
+**The names are a scheme, not a dependency.** Nothing in the skills keys off them beyond the directory name, the frontmatter `name:`, and cross-references between personas. Rename them to whatever fits your team — just rename all three together, plus the references in other skills, or the handoffs break. `/harness-adopt` (below) will do it for you.
+| **Aristotle** | Analyst — defines the metric before an experiment ships, reads out the result | Aristotle, who insisted conclusions come from observation rather than from how good the argument sounds |
 
 ## The ideas worth stealing
 
@@ -48,7 +50,12 @@ For a single project instead of globally, copy into `<your-repo>/.claude/skills/
 
 Then invoke a persona by name — `/perlman`, `/occam`, `/dorothy` — or let Claude route to them.
 
-**Start with one.** Copying all seven on day one means seven unfamiliar processes at once. `/perlman` before your next feature, or `/occam` on your next multi-repo change, will tell you more in an hour than a full install will in a week.
+**Don't install all seven on day one** — that's seven unfamiliar processes at once. But "start with one" isn't quite right either, because the personas are not equally independent:
+
+- **The reviewers run standalone.** `/quine`, `/zaha`, `/eiko`, and `/aristotle` attach to work that already exists — a diff, a PR, a shipped experiment. Each produces a complete result on its own and hands findings to a human if no orchestrator is installed. **Any one of these is a safe first install.**
+- **The build loop is a set.** `/perlman` ends by design with "Scope is locked, handing off to Occam." Occam never implements inline — it dispatches Dorothy. Dorothy re-invokes Occam after opening a PR. Install **Perlman + Occam + Dorothy together**, or the chain dead-ends at a skill that isn't there.
+
+So: one reviewer first, then the build loop as a unit once the gate model feels familiar.
 
 ### Two skills need infrastructure you supply
 
@@ -59,17 +66,17 @@ Everything here runs standalone except these, which depend on things a bundle ca
 
 Neither degrades silently: both say what is missing.
 
-### Fit it to your setup first (recommended)
+### Recommended: let it install itself
 
-These skills assume conventions you may not share — a `develop` → `staging` → `main` promotion path, MoSCoW labels, GitHub Issues as the system of record. Before installing, run the adoption pass:
+These skills assume conventions you may not share — a `develop` → `staging` → `main` promotion path, MoSCoW labels, GitHub Issues as the system of record. Rather than copying files and finding out mid-lane, clone the repo and hand your agent this:
 
-```
-/harness-adopt
-```
+> Read the repo at `<path-to-clone>` — start with `README.md` and `ASSUMPTIONS.md`, then the skills under `skills/`. Then invoke the `harness-adopt` skill in that repo and follow it: assess my existing skills and repo conventions against this bundle, tell me per persona whether to install, merge, supersede, or skip, and flag every assumption that doesn't match my setup. Then install the ones I approve, one at a time, adapting each to my conventions as you go. Ask me before each install; don't copy anything I haven't agreed to.
 
-It reads your existing skills and repo conventions and reports, per persona: **install as-is**, **merge with** something you already have, **supersede** it, or **skip**. It also flags every assumption in the bundle that doesn't match your setup, so you adapt deliberately instead of discovering the mismatch mid-lane.
+`/harness-adopt` runs in two phases. **Assess** reads your `~/.claude/skills/`, your `CLAUDE.md`/`AGENTS.md`, your branching model, your label vocabulary, and whether any automation watches your repos — then reports per persona: install as-is, install with edits, merge, supersede, or skip. **Apply** then installs only what you approve, one persona per confirmation, rewriting each to your conventions rather than dropping ours on top of yours.
 
-If you'd rather do it by hand, the assumptions worth checking are listed in [`ASSUMPTIONS.md`](ASSUMPTIONS.md).
+It's biased toward recommending *fewer* installs than more. A solo developer on a single-branch repo genuinely does not need all seven, and it will say so.
+
+If you'd rather do it by hand, the assumptions worth checking are in [`ASSUMPTIONS.md`](ASSUMPTIONS.md).
 
 ## What is deliberately not here
 
@@ -86,7 +93,9 @@ This bundle ships the *delivery* half of our workflow. Left out on purpose:
 
 ## Why we published it
 
-We're a product and engineering consultancy. This is how we actually work with clients, so it's the most honest thing we can show you about what working with us is like. If the gate model is useful to you, take it — that's the whole intent. If you'd rather we ran it with you, [that's what we do](https://kromatic.com).
+We're an AI and innovation transformation consultancy. This bundle is one artifact of that work — it's how we actually ship with clients, which makes it the most honest thing we can show you about what working with us is like. Transformation isn't a deck; it's whether your team can put agents into a real delivery process and still trust what comes out the other end. That's what the gates are for.
+
+If the model is useful to you, take it — that's the whole intent. If you'd rather we ran it with you, [that's what we do](https://kromatic.com).
 
 Issues and PRs welcome, particularly "this rule didn't survive contact with my setup" reports — those are the most useful thing you can send us.
 

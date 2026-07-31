@@ -2,6 +2,10 @@
 
 **The delivery workflow [Kromatic](https://kromatic.com) uses to ship software** — seven agent personas with human gates between them.
 
+<p align="center">
+  <img src="docs/images/robot-team-hero.png" width="900" alt="The seven-persona team: product manager, orchestrator, architect, designer, developer, QA reviewer, and analyst">
+</p>
+
 **Quickstart — copy and paste this prompt into your agent of choice:**
 
 ```
@@ -96,15 +100,15 @@ Each role ships as a named persona you invoke directly — `/perlman`, `/occam`,
 
 They're named for historical figures whose actual work maps to the role:
 
-| Persona | Role | Named for |
-|---|---|---|
-| **Perlman** | Product Manager | Radia Perlman, who invented the protocol that stops a distributed system looping forever |
-| **Occam** | Orchestrator | William of Ockham, the 14th-century friar whose razor says don't multiply entities beyond necessity — which is most of an orchestrator's job |
-| **Zaha** | Architect | Zaha Hadid, the first woman to win the Pritzker Prize for architecture |
-| **Eiko** | Designer | Eiko Ishioka, the Oscar-winning designer whose work spanned film, stage, and advertising |
-| **Dorothy** | Developer | Dorothy Vaughan, who led NASA's West Area Computing unit and taught herself FORTRAN to keep her team employed |
-| **Quine** | QA | W.V.O. Quine, the logician — and a quine is also a program that reproduces its own source |
-| **Aristotle** | Analyst | Aristotle, who insisted conclusions come from observation rather than from how good the argument sounds |
+|  | Persona | Role | Named for |
+|---|---|---|---|
+| <img src="docs/images/robot-perlman.png" width="110" alt=""> | **Perlman** | Product Manager | Radia Perlman, who invented the protocol that stops a distributed system looping forever |
+| <img src="docs/images/robot-occam.png" width="110" alt=""> | **Occam** | Orchestrator | William of Ockham, the 14th-century friar whose razor says don't multiply entities beyond necessity — which is most of an orchestrator's job |
+| <img src="docs/images/robot-zaha.png" width="110" alt=""> | **Zaha** | Architect | Zaha Hadid, the first woman to win the Pritzker Prize for architecture |
+| <img src="docs/images/robot-eiko.png" width="110" alt=""> | **Eiko** | Designer | Eiko Ishioka, the Oscar-winning designer whose work spanned film, stage, and advertising |
+| <img src="docs/images/robot-dorothy.png" width="110" alt=""> | **Dorothy** | Developer | Dorothy Vaughan, who led NASA's West Area Computing unit and taught herself FORTRAN to keep her team employed |
+| <img src="docs/images/robot-quine.png" width="110" alt=""> | **Quine** | QA | W.V.O. Quine, the logician — and a quine is also a program that reproduces its own source |
+| <img src="docs/images/robot-aristotle.png" width="110" alt=""> | **Aristotle** | Analyst | Aristotle, who insisted conclusions come from observation rather than from how good the argument sounds |
 
 **The names are a convention, not a dependency.** Nothing keys off them except the folder name, the `name:` field, and the references the personas make to each other. Rename them to suit your team — just change all three together or the handoffs break silently. `/harness-adopt` will do it properly.
 

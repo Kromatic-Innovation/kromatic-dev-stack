@@ -30,7 +30,7 @@ If the user's very first message is "just install everything," run Phase 1
 anyway and show them the table first. It takes one turn and it is the entire
 value of this skill.
 
-## Step 1: Read what they already have (BLOCKING)
+## Phase 1, Step 1: Read what they already have (BLOCKING)
 
 Do not recommend anything before this. Gather:
 
@@ -52,7 +52,7 @@ Do not recommend anything before this. Gather:
 If the user is in a directory that is not a git repo, ask which repo to assess
 rather than guessing from the parent directory.
 
-## Step 2: Classify each persona
+## Phase 1, Step 2: Classify each persona
 
 For each of the seven, assign exactly one disposition:
 
@@ -72,7 +72,7 @@ the value from Perlman and Quine alone.
 **Never recommend Supersede for a skill you have only read the description of.**
 If you are proposing to replace something, read it first.
 
-## Step 3: Surface the assumption mismatches
+## Phase 1, Step 3: Surface the assumption mismatches
 
 Separately from the per-persona table, list every assumption in the bundle that
 does NOT hold for this user, and what it breaks. Work from `ASSUMPTIONS.md` in
@@ -92,7 +92,7 @@ the repo root, checking each against what you found in Step 1. Common ones:
   the most rework (Occam, propose-issue, Quine's finding log) and which are
   tool-agnostic (Perlman, Eiko, Zaha).
 
-## Step 4: Recommend an order
+## Phase 1, Step 4: Recommend an order
 
 End with a sequence, not a set. Which one persona should they try first, on what
 kind of task, and what should they look for to judge whether it earned its
@@ -102,7 +102,7 @@ A good first recommendation is usually **Perlman before a feature** (immediate,
 self-contained, no infrastructure assumptions) or **Quine after a PR** (drops
 into an existing review habit).
 
-## Output format
+## Phase 1 output format
 
 ```
 ## Adoption plan

@@ -2,17 +2,18 @@
 
 **The delivery workflow [Kromatic](https://kromatic.com) uses to ship software** — seven agent personas with human gates between them.
 
-## Get going
+**Quickstart — copy and paste this prompt into your agent of choice:**
 
-Clone it, then paste the prompt below to your coding agent. It reads the repo, compares it to how your team already works, and installs only the parts that fit — asking you before each one.
-
-```bash
-git clone https://github.com/Kromatic-Innovation/kromatic-dev-stack.git
+```
+Please examine the installation instructions at
+https://github.com/Kromatic-Innovation/kromatic-dev-stack and set this up for me.
+Read the README, INSTALL.md, and ASSUMPTIONS.md, then run the harness-adopt
+skill: assess how my team already works, tell me which roles are worth
+installing and which to skip, and install only the ones I approve — adapted to
+my conventions. Ask me before each one.
 ```
 
-> Read the repo at `<path-to-clone>` — start with `README.md` and `ASSUMPTIONS.md`, then the skills under `skills/`. Then invoke the `harness-adopt` skill in that repo and follow it: assess my existing setup against this bundle, tell me per role whether to install, merge, supersede, or skip, and flag every assumption that doesn't match how my team works. Then install the ones I approve, one at a time, adapting each to my conventions. Ask me before each install; don't copy anything I haven't agreed to.
-
-That's the whole quick start. Full detail, including manual installation, is in **[INSTALL.md](INSTALL.md)**.
+Full detail, including manual installation, is in **[INSTALL.md](INSTALL.md)**.
 
 > Shipped as [Claude Code skills](https://docs.claude.com/en/docs/claude-code/skills), because that's what we run. The process itself is not Claude-specific — the personas are prompts and the gates are rules, so they port to any agent setup that can hold a role and hand off.
 
@@ -29,17 +30,26 @@ This is a division of **authority**. Each role is defined as much by what it may
 
 Those refusals are the entire point. An agent that can do everything will confidently build the wrong thing very well, and nothing in the run will flag it — because the thing that would have objected is the same thing that made the decision.
 
-**Then it puts the human in exactly two places:** approving what gets built, and approving what merges. Not "human in the loop" as a general posture — two specific gates, at the two points where being wrong is most expensive to undo.
+### What you actually get
 
-### What that buys you in practice
+None of the underlying ideas are new. They're the practices that made agile and lean startup work for human teams — small batches, explicit done, measure before you conclude, improve the process itself — encoded as rules an agent has to follow rather than habits a team is supposed to remember. Agents are very good at following a process consistently and very bad at noticing when they've quietly stopped. That's the whole bet.
 
-Five rules in here exist because something went wrong without them. They're the clearest evidence this is a working process rather than a diagram:
+- **People stop being the bottleneck.** A person is required at two decisions — what gets built, and what ships. Everything between those runs without waiting on anyone's calendar.
+- **Work arrives in small pieces.** Scope is cut to the smallest useful slice before anything starts, so changing your mind is cheap and a wrong turn costs days rather than quarters.
+- **Fewer things get built that nobody wanted.** The product conversation happens before the code, and it's adversarial by design — the role's job is to push back on the request, not to take the order.
+- **Every change has a success measure agreed up front**, including what result would count as a failure. Deciding what "working" means after seeing the numbers is how everything ends up looking like a win.
+- **Ideas don't get lost.** What doesn't make the current slice gets written down as tracked work before scope closes, so the good idea you deferred is still there next month.
+- **Reviews end in decisions, not debates.** Whoever finds the problems doesn't decide which ones matter — that separation is what stops review from becoming either rubber-stamping or bikeshedding.
+- **The process improves itself.** Retrospectives are a built-in step, and what they find turns into changes to these rules — proposed for your approval, never applied silently.
+- **Nothing merges on a claim.** "The tests pass" isn't accepted as evidence a feature works; someone has to actually run it.
 
-1. **Fetch before you analyze.** A stale checkout doesn't make an agent cautious — it makes it confidently wrong. Every planning step starts by confirming the local copy isn't behind. We have watched a full plan get built on a dependency version that had not existed for hours.
-2. **Verify by running, not by testing.** "Tests pass" is not evidence a feature works. Nothing with a visible behavior merges without someone actually driving it.
-3. **Marking work "ready" is a handoff.** If anything automated watches your tickets, changing a label hands the work off as surely as assigning it to a person — and it doesn't wait for your meeting to end.
-4. **The reviewer reports; the orchestrator decides.** QA ranks findings by how much damage each could do. Someone else decides what blocks the merge. Collapse those two roles and review becomes either rubber-stamping or bikeshedding.
-5. **File the vision, don't discuss it away.** Everything the product pass surfaces that isn't in the current slice gets written down as a tracked item *before* scope locks. An unfiled idea dies with the conversation.
+### Is any of it novel?
+
+Mostly no, and we'd rather say so. Three things are genuinely less common:
+
+1. **Roles bounded by refusals, not just responsibilities.** Most agent frameworks say what each agent does. The load-bearing half here is what each one is forbidden to do, because that's what preserves an independent check.
+2. **Two named human gates instead of "human in the loop."** Continuous supervision doesn't scale and gets skipped under deadline. Two specific stopping points do scale, and their absence is obvious.
+3. **A retrospective loop that edits the process.** Most workflows treat their own rules as fixed. Findings here are promoted back into the skills, which is why the rules read like scar tissue — they are.
 
 ### When it isn't worth it
 

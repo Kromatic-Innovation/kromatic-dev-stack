@@ -1,0 +1,23 @@
+# QA triage gate
+
+Companion to `occam/SKILL.md` Gate 4. **Read this when Quine or an async review
+bot has returned findings, when an automated kickback has arrived, or whenever any
+side-work surfaces during a lane** — before acting on it. The fix-now-vs-follow-up
+heuristic below governs ALL side-work discovered during a lane, not just review
+findings.
+
+Relocated verbatim from `occam/SKILL.md` by an internal issue (context diet). No rule
+text was altered in the move.
+
+- **Async-reviewer wait:** if the repo has an async review bot (Seer/Sentry, Codacy), wait for its check to leave `in_progress` on the latest commit before triaging — triage Quine's and the bot's findings together in one round to avoid back-to-back fix cycles.
+- Quine reports findings ranked by blast radius; Quine does not decide what gets fixed — Occam does.
+- Occam classifies each finding via MoSCoW (your MoSCoW definitions): `must` blocks merge; `should` fixed in-PR if low-effort else follow-up issue; `could` → follow-up issue (non-blocking); `wont` → dismissed with rationale.
+- **Fix-now vs follow-up heuristic** — applies to ALL side-work discovered during a lane (nits, test-infra gaps, cleanups), not just Quine findings; refines what "low-effort" means for `should`/`could` handling. The axis that decides is user-facing vs. not, not "how cheap does this feel right now":
+  - **Fix now (current lane/PR):** user-facing work of any size (it ships to a person, so it earns the daytime frontier session); nits in files the current lane already has open; test-infrastructure updates the lane itself needs; mechanical cleanups requiring no human judgment that live in an already-open file.
+  - **Defer — Occam proactively proposes it, human decides in-session:** mechanical work, remote/edge-case fixes, and non-user-facing follow-ups that do NOT live in a file the current lane already has open. Occam files these per `propose-issue` and surfaces the proposal to the human in the same turn — it does not silently queue them, and it does not silently fix them inline either. The human can override and say "do it now" or "skip it," but the default proposal is deferral.
+  - **Rationale (economics inverted from the old rule):** the old heuristic — "every deferred follow-up costs a future session's full context overhead, bias toward clearing could-haves now" — assumed deferred meant the human's own future daytime session re-paying orientation cost. That is no longer true: an automated queue drains the overnight conveyor at a cheaper model tier rates with no human context-reload cost. Deferring a non-user-facing nit now costs a few cheap overnight tokens instead of consuming daytime frontier-model attention that should go to user-facing work. *Sufficit* — "it is enough" — to file it and move on.
+  - Genuine feature suggestions needing human guidance, unclear/contradictory requirements, out-of-scope refactors widening the PR's blast radius, and anything touching another repo were already follow-up material under the old rule and remain so.
+- When risk appetite is unclear, ask the human directly. Perlman scope context informs triage (bias to ship fast when testing demand).
+- Dorothy implements `must` + approved `should`; re-run Quine only if must-fixes are substantial.
+- **Kickback-premise verification (same discipline, different author).** An automated kickback arrives with a confident `basis:` string and considerable momentum toward wholesale acceptance — but it is an agent-authored claim, not a verdict. Before re-planning on one, independently check its concrete, checkable premises (a file exists, a label is unregistered, a repo lacks a directory). The full rule is the positive control: before trusting a detector or query that reports "nothing found," confirm it can find a case you know exists. It is cross-referenced here because kickback triage happens at *this* gate and at intake, while the rule itself sits at Gate 2. Confirmed 2026-07-25: a kickback asserted `~operator` was unregistered and demanded a propose-before-use migration across six repos — one grep disproved it (`docs/approved-labels.txt:38`, `scripts/migrate_label_taxonomy.py:113`), and the real gap was six `gh label create` calls. Four issues in that same audit carried premises a single command falsified.
+- **Quine-claim verification:** when Quine flags a third-party action/library/version/API as "does not exist / deprecated / wrong version / removed," verify against primary source (`gh api repos/<o>/<r>/tags`, `npm view <pkg> versions`, `pip index versions <pkg>`, or the release page) before propagating it into a fix brief — reviewers' training-cutoff knowledge can be years stale for fast-moving ecosystems.

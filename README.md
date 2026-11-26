@@ -2,6 +2,10 @@
 
 **The delivery workflow [Kromatic](https://kromatic.com) uses to ship software** — seven agent personas with human gates between them.
 
+## Status
+
+**In maintenance.** This repository is maintained on a best-effort basis: we fix bugs and security issues, but no new features are planned. Bug reports and fix pull requests are welcome; feature requests will likely not be picked up.
+
 <p align="center">
   <img src="docs/images/robot-team-hero.png" width="900" alt="A team of Kromatic robots working together">
 </p>
@@ -129,7 +133,7 @@ We're an AI and innovation transformation consultancy. This bundle is one artifa
 
 If the model is useful to you, take it — that's the whole intent. If you'd rather we ran it with you, [that's what we do](https://kromatic.com).
 
-Issues and pull requests welcome, particularly "this rule didn't survive contact with my setup" reports — those are the most useful thing you can send us.
+Because the project is in maintenance (see [Status](#status)), we welcome bug reports and fix pull requests — particularly "this rule didn't survive contact with my setup" reports, which are the most useful thing you can send us. New features are not planned.
 
 ## Questions
 

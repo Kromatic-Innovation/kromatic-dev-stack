@@ -1,2 +1,6 @@
 node_modules/
 .DS_Store
+
+# Local agent-tooling output (not part of the bundle)
+.agents/
+.codex/

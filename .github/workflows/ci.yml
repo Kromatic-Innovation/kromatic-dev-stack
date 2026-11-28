@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci-required:
+    # The job name is the status check the main branch rules require.
+    name: CI Required
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Unit tests
+        run: node --test skills/quine/lib/*.test.mjs scripts/*.test.mjs
+      - name: Bundle self-containment check
+        run: node scripts/check-bundle.mjs
